@@ -46,7 +46,7 @@ const SignupForm = () => {
   return (
     <form
       onSubmit={handleSubmit(handleSignup)}
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#ffffff] rounded-lg shadow-2xl px-7 py-12"
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#ffffff] rounded-lg shadow-2xl px-10 py-12"
     >
       <header className="flex justify-center mb-8">
         <img width={135} height={51} src={chatLogo} alt="chat-logo" />
@@ -103,9 +103,11 @@ const SignupForm = () => {
         )}
       </div>
       <button
-        disabled={isLoading}
+        disabled={
+          isLoading || !watch("name") || !watch("email") || !watch("phone")
+        }
         className={`w-full  text-white rounded-[6px] py-[13px] mt-1 ${
-          isLoading || (watch("name") && watch("email") && watch("phone"))
+          watch("name") && watch("email") && watch("phone")
             ? "bg-[#6E80A4] cursor-pointer"
             : "bg-[#DFE4EA] cursor-not-allowed"
         }`}
