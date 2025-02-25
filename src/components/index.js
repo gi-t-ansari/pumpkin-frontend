@@ -1,2 +1,2 @@
 export { SignupForm } from "./forms";
-export { ChatCard } from "./cards";
+export { ChatCard, MessagesCard } from "./cards";
