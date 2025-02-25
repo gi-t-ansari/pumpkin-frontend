@@ -27,7 +27,7 @@ const Message = ({ data }) => {
 };
 
 const MessagesCard = ({ data }) => {
-  const [isUserDetailOpen, setIsUserDetailOpen] = useState(true);
+  const [isUserDetailOpen, setIsUserDetailOpen] = useState(false);
 
   const openUserDetails = (e) => {
     e.preventDefault();

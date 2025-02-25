@@ -1,6 +1,9 @@
 import moment from "moment";
 import React from "react";
-import { extractFirstLetterOfNameAndSurname } from "../../config";
+import {
+  extractFirstLetterOfNameAndSurname,
+  formatTimestamp,
+} from "../../config";
 
 const ChatCard = ({ data, setSelectedChat, selectedChat }) => {
   const handleOpenMessages = (e) => {
@@ -31,7 +34,7 @@ const ChatCard = ({ data, setSelectedChat, selectedChat }) => {
         </div>
         <div>
           <span className="text-xs text-[#707991]">
-            {moment(data?.lastMessageDate).format("h:mm a")}
+            {formatTimestamp(data?.lastMessageDate).dateFull}
           </span>
         </div>
       </div>
