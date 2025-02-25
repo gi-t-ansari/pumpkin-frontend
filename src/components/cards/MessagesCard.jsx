@@ -62,7 +62,7 @@ const MessagesCard = ({ data }) => {
             <Message data={msg} />
           ))}
         </section>
-        <footer className="w-full h-fit px-10 py-2 bg-inherit">
+        <footer className="w-full h-fit px-10 py-4 bg-[#f6f6f6]">
           <div className="relative w-full h-fit">
             <input
               type="text"
