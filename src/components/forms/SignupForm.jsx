@@ -3,9 +3,14 @@ import chatLogo from "../../assets/chat-logo.svg";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { createTCPClient } from "../../services/tcpService";
+
+const SERVER_HOST = "localhost";
+const SERVER_PORT = "5000";
 
 const SignupForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [socketClient, setSocketClient] = useState(null);
 
   const schema = yup.object().shape({
     name: yup
@@ -20,7 +25,7 @@ const SignupForm = () => {
       .matches(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid Email"),
     phone: yup
       .string()
-      .required("Number if required.")
+      .required("Phone number is required.")
       .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits.")
       .matches(/^\d+$/, "Phone number must contain only digits."),
   });
@@ -29,18 +34,32 @@ const SignupForm = () => {
     handleSubmit,
     reset,
     watch,
-    getValues,
     register,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema), mode: "onChange" });
 
-  const handleSignup = (data) => {
+  const handleSignup = async (data) => {
     setIsLoading(true);
-    setTimeout(() => {
-      console.log("Form Data --> ", data);
+    try {
+      console.log("🚀 Signing Up...", data);
+
+      const { sendMessage } = createTCPClient(
+        SERVER_HOST,
+        SERVER_PORT,
+        data.email,
+        (message) => console.log("📩 New Message:", message)
+      );
+
+      setSocketClient({ sendMessage });
+
+      sendMessage({ type: "signup", user: data });
+
       reset();
+    } catch (error) {
+      console.error("Signup Error:", error);
+    } finally {
       setIsLoading(false);
-    }, 3000);
+    }
   };
 
   return (
@@ -51,68 +70,70 @@ const SignupForm = () => {
       <header className="flex justify-center mb-8">
         <img width={135} height={51} src={chatLogo} alt="chat-logo" />
       </header>
-      <div className="mb-3 w-fit h-fit">
-        <div className="w-fit h-fit">
-          <input
-            className={`py-3 px-4 rounded-[6px] min-w-[400px] border ${
-              errors?.name
-                ? "border-red-500"
-                : "border-[#DFE4EA] focus:border-[#6E80A4]"
-            } placeholder:text-[#9CA3AF]   outline-none transition-all duration-300 ease-linear`}
-            type="text"
-            placeholder="Name"
-            {...register("name")}
-          />
-        </div>
+
+      {/* Name Input */}
+      <div className="mb-3 w-[400px]">
+        <input
+          className={`py-3 px-4 rounded-[6px] w-full border ${
+            errors?.name
+              ? "border-red-500"
+              : "border-gray-300 focus:border-[#6E80A4]"
+          } outline-none`}
+          type="text"
+          placeholder="Name"
+          {...register("name")}
+        />
         {errors?.name && (
-          <p className="text-xs text-red-500">{errors?.name?.message}</p>
+          <p className="text-xs text-red-500">{errors.name.message}</p>
         )}
       </div>
-      <div className="mb-3 w-fit h-fit">
-        <div className="w-fit h-fit">
-          <input
-            className={`py-3 px-4 rounded-[6px] min-w-[400px] border ${
-              errors?.email
-                ? "border-red-500"
-                : "border-[#DFE4EA] focus:border-[#6E80A4]"
-            } placeholder:text-[#9CA3AF]   outline-none transition-all duration-300 ease-linear`}
-            type="email"
-            placeholder="Email"
-            {...register("email")}
-          />
-        </div>
+
+      {/* Email Input */}
+      <div className="mb-3 w-[400px]">
+        <input
+          className={`py-3 px-4 rounded-[6px] w-full border ${
+            errors?.email
+              ? "border-red-500"
+              : "border-gray-300 focus:border-[#6E80A4]"
+          } outline-none`}
+          type="email"
+          placeholder="Email"
+          {...register("email")}
+        />
         {errors?.email && (
-          <p className="text-xs text-red-500">{errors?.email?.message}</p>
+          <p className="text-xs text-red-500">{errors.email.message}</p>
         )}
       </div>
-      <div className="mb-3 w-fit h-fit">
-        <div className="w-fit h-fit">
-          <input
-            className={`py-3 px-4 rounded-[6px] min-w-[400px] border ${
-              errors?.phone
-                ? "border-red-500"
-                : "border-[#DFE4EA] focus:border-[#6E80A4]"
-            } placeholder:text-[#9CA3AF]   outline-none transition-all duration-300 ease-linear`}
-            type="text"
-            placeholder="Number"
-            {...register("phone")}
-          />
-        </div>
+
+      {/* Phone Input */}
+      <div className="mb-3 w-[400px]">
+        <input
+          className={`py-3 px-4 rounded-[6px] w-full border ${
+            errors?.phone
+              ? "border-red-500"
+              : "border-gray-300 focus:border-[#6E80A4]"
+          } outline-none`}
+          type="text"
+          placeholder="Phone Number"
+          {...register("phone")}
+        />
         {errors?.phone && (
-          <p className="text-xs text-red-500">{errors?.phone?.message}</p>
+          <p className="text-xs text-red-500">{errors.phone.message}</p>
         )}
       </div>
+
+      {/* Submit Button */}
       <button
         disabled={
           isLoading || !watch("name") || !watch("email") || !watch("phone")
         }
-        className={`w-full  text-white rounded-[6px] py-[13px] mt-1 ${
+        className={`w-full text-white rounded-[6px] py-[13px] mt-1 ${
           watch("name") && watch("email") && watch("phone")
             ? "bg-[#6E80A4] cursor-pointer"
-            : "bg-[#DFE4EA] cursor-not-allowed"
+            : "bg-gray-300 cursor-not-allowed"
         }`}
       >
-        {isLoading ? "Signing Up" : "Sign Up"}
+        {isLoading ? "Signing Up..." : "Sign Up"}
       </button>
     </form>
   );
