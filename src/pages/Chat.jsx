@@ -12,7 +12,7 @@ const Chat = () => {
   return (
     <div className="h-screen w-screen bg-[#8BABD8] p-10">
       <div className="w-full h-full  bg-white flex ">
-        <section className="bg-white h-full basis-[25%] py-4 flex flex-col">
+        <section className="bg-white h-full basis-[25%] py-4 flex flex-col border-r border-[#D9DCE0]">
           {/**--------------------- LOGO ------------------- */}
           <header className="h-fit w-full mb-2 pl-4">
             <img
